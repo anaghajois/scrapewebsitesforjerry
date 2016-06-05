@@ -25,9 +25,19 @@ def GetMoreInfo(partdetail):
     availability = sanitizer.sanitize_item(avail_rows[0])
     lead_time = sanitizer.sanitize_item(avail_rows[3])
 
+    try:
+        images = table_columns[1].find_element_by_tag_name("img")
+        src = images.get_attribute('src')
+        file_name =  row_data['part'].split()[0]
+        file_name = file_name.replace('\\', '')
+        file_name = file_name.replace(':', '')
+        urllib.urlretrieve(src, 'tti\\' + file_name + '.png')
+    except:
+        print "No image found"
+
     return {'part_details':part_details_text, 'availability':availability, 'lead_time':lead_time}
 
-def ProductFromTTI(url):
+def ProductFromTTINC(url):
     dcap = dict(DesiredCapabilities.PHANTOMJS)
     dcap["phantomjs.page.settings.userAgent"] = (
         "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
@@ -58,7 +68,6 @@ def ProductFromTTI(url):
             driver.implicitly_wait(10) # seconds
             part_detail = driver.find_element_by_id("partdetail")
             row_data = GetMoreInfo(part_detail)
-            print row_data
             dict_lst.append(row_data)
             driver.execute_script("window.history.go(-1)")
             driver.implicitly_wait(10)
@@ -68,6 +77,7 @@ def ProductFromTTI(url):
 
         row_index += 1
     driver.close()
+    return dict_lst
 
-url = "http://www.ttiinc.com/page/search_results.html?searchTerms=CDR32BX103BKUS&searchType=s&systemsCatalog=&autoComplete=false&x=14&y=7"
-ProductFromTTI(url)
+url ="http://www.ttiinc.com/page/search_results.html?s=729090318_43"
+print ProductFromTTINC(url)

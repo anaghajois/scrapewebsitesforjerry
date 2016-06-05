@@ -31,7 +31,7 @@ def ProductFromMasterElectronics(url):
     content = driver.find_element_by_id("ctl00_UpdatePanel1")
     print "Page is ready!"
 
-    table_columns_text_list = []
+
     result_table = content.find_element_by_id("myTable")
     table_body = result_table.find_element_by_tag_name('tbody')
     table_rows = table_body.find_elements_by_xpath('//tbody/tr[starts-with(@class,"Results")]')
@@ -43,17 +43,16 @@ def ProductFromMasterElectronics(url):
         wanted_columns = []
         row_data = {}
         for wanted_column in wanted_column_data:
-            #print wanted_column['index']
             if wanted_column['index'] == 5:
                 column_text = sanitizer.sanitize_item(table_columns[wanted_column['index']].find_element_by_id('avaiablity'))
             else:
                 column_text = sanitizer.sanitize_item(table_columns[wanted_column['index']])
             row_data[wanted_column['name']] = column_text
 
-        print row_data
         dict_lst.append(row_data)
         row_index += 1
     driver.close()
+    return dict_lst
 
 url = "http://www.masterelectronics.com/parts.aspx?Text=mmss8050-h-tp&pagenum=3"
-ProductFromMasterElectronics(url)
+print ProductFromMasterElectronics(url)
