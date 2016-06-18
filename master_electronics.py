@@ -6,6 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import re
 import sanitizer
+import urllib
+
 #user_agent = (
 #    "Firefox Browser"
 #)
@@ -21,8 +23,8 @@ def ProductFromMasterElectronics(url):
 
 
     #desired_capabilities=dcap,
-    driver = webdriver.PhantomJS(desired_capabilities=dcap, executable_path='C:\\Users\\AB\\AppData\\Roaming\\npm\\node_modules\\phantomjs\\lib\\phantom\\bin\\phantomjs.exe') # or add to your PATH
-    #driver = webdriver.Firefox()
+    #driver = webdriver.PhantomJS(desired_capabilities=dcap, executable_path='C:\\Users\\AB\\AppData\\Roaming\\npm\\node_modules\\phantomjs\\lib\\phantom\\bin\\phantomjs.exe') # or add to your PATH
+    driver = webdriver.Firefox()
     driver.set_window_size(1024, 768) # optional
     driver.get(url)
 
@@ -48,6 +50,18 @@ def ProductFromMasterElectronics(url):
             else:
                 column_text = sanitizer.sanitize_item(table_columns[wanted_column['index']])
             row_data[wanted_column['name']] = column_text
+        try:
+            images = table_rows[row_index].find_element_by_xpath("//td/a/img")
+            src = images.get_attribute('src')
+            print src
+            file_name =  row_data['part_number']
+            file_name = file_name.replace('\\', '')
+            file_name = file_name.replace(':', '')
+
+            urllib.urlretrieve(src, 'images\\master_electronics\\' + file_name + '.png')
+        except Exception,e:
+            print str(e)
+            print "No image found"
 
         dict_lst.append(row_data)
         row_index += 1

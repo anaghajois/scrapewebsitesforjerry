@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import re
 import sanitizer
+import urllib
 
 def ProductFromArrow(url):
     dcap = dict(DesiredCapabilities.PHANTOMJS)
@@ -34,6 +35,18 @@ def ProductFromArrow(url):
         for wanted_column in wanted_column_data:
             column_text = sanitizer.sanitize_item(table_columns[wanted_column['index']])
             row_data[wanted_column['name']] = column_text
+        try:
+            images = table_rows[row_index].find_element_by_xpath("//a/div/img")
+            src = images.get_attribute('src')
+            print src
+            file_name =  row_data['part number']
+            file_name = file_name.replace('\\', '')
+            file_name = file_name.replace(':', '')
+
+            urllib.urlretrieve(src, 'images\\arrow\\' + file_name + '.png')
+        except Exception,e:
+            print str(e)
+            print "No image found"
 
         #print row_data
         dict_lst.append(row_data)

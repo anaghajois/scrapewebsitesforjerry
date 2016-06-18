@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import re
 import sanitizer
+import urllib
 
 def ProductFromFutureElectronics(url):
     dcap = dict(DesiredCapabilities.PHANTOMJS)
@@ -33,6 +34,18 @@ def ProductFromFutureElectronics(url):
         product_dict['price'] = sanitizer.sanitize_item(main_product_summary.find_element_by_xpath("//div/div/div/p/span[@class='prices-value']"))
         product_dict['stock'] = sanitizer.sanitize_item(main_product_summary.find_element_by_xpath("//div/div/div/p/span[@class='prices-in-stock-value']"))
 
+        try:
+            images = main_product_summary.find_element_by_xpath("//div/div/div/div[@class = 'thumbnail']/a/img[@class = 'productThumbnail']")
+            src = images.get_attribute('src')
+            print src
+            file_name =  product_dict['mrf_part#']
+            file_name = file_name.replace('\\', '')
+            file_name = file_name.replace(':', '')
+
+            urllib.urlretrieve(src, 'images\\future_electronics\\' + file_name + '.png')
+        except Exception,e:
+            print str(e)
+            print "No image found"
         dict_lst.append(product_dict)
     driver.close()
     return dict_lst
